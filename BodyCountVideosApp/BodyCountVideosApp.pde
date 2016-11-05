@@ -13,6 +13,10 @@ Kinect kinect;
 OpenCV opencv;
 Movie movie;
 
+int lowerThreshold;
+int upperThreshold;
+PImage thresholder;
+
 void setup() {
   size(1920, 520);
 
@@ -29,6 +33,10 @@ void setup() {
 
   movie = new Movie(this, videoFilename);
   movie.loop();
+
+  lowerThreshold = 145;
+  upperThreshold = 156;
+  thresholder = createImage(kinect.width, kinect.height, ALPHA);
 }
 
 void draw() {
@@ -38,7 +46,8 @@ void draw() {
   background(0);
   image(kinect.getDepthImage(), 0, 0);
 
-  opencv.loadImage(kinect.getDepthImage());
+  updateThresholder(kinect.getDepthImage());
+  opencv.loadImage(thresholder);
   opencv.blur(3);
   opencv.dilate();
 
@@ -105,3 +114,39 @@ BodyCountSound getBodyCountSoundByBodyCount(int bodyCount) {
   return null;
 }
 
+void updateThresholder(PImage source) {
+  color white = color(255);
+  color black = color(0);
+  thresholder.loadPixels();
+  source.loadPixels();
+  for (int i = 0; i < source.width * source.height; i++) {
+    float b = brightness(source.pixels[i]);
+    thresholder.pixels[i] = b > lowerThreshold && b < upperThreshold ? white : black;
+  }
+  thresholder.updatePixels();
+}
+
+void keyReleased() {
+  switch(key) {
+    case 'j':
+      lowerThreshold--;
+      println("New lower threshold: " + lowerThreshold);
+      break;
+    case 'k':
+      if (lowerThreshold < upperThreshold) {
+        lowerThreshold++;
+        println("New lower threshold: " + lowerThreshold);
+      }
+      break;
+    case 'J':
+      if (lowerThreshold < upperThreshold) {
+        upperThreshold--;
+        println("New upper threshold: " + upperThreshold);
+      }
+      break;
+    case 'K':
+      upperThreshold++;
+      println("New upper threshold: " + upperThreshold);
+      break;
+  }
+}
