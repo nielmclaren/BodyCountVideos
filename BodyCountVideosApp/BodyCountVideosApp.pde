@@ -7,6 +7,7 @@ import processing.video.*;
 
 JSONObject configJSON;
 ArrayList<BodyCountSound> bodyCountSounds;
+BodyCountSound currSound;
 
 Kinect kinect;
 OpenCV opencv;
@@ -18,6 +19,7 @@ void setup() {
   configJSON = loadJSONObject("config.json");
   String videoFilename = configJSON.getString("videoFilename");
   bodyCountSounds = getBodyCountSounds(configJSON.getJSONArray("audioFilenames"));
+  currSound = null;
 
   kinect = new Kinect(this);
   kinect.initDepth();
@@ -30,6 +32,9 @@ void setup() {
 }
 
 void draw() {
+  int bodyCount = (millis() / 10000) % 9;
+  updateSound(bodyCount);
+
   background(0);
   image(kinect.getDepthImage(), 0, 0);
 
@@ -70,3 +75,33 @@ ArrayList<BodyCountSound> getBodyCountSounds(JSONArray audioFilenamesJSON) {
 
   return result;
 }
+
+void updateSound(int bodyCount) {
+  // TODO: Crossfade durations from config.
+  BodyCountSound nextSound = getBodyCountSoundByBodyCount(bodyCount);
+  if (nextSound != currSound && (nextSound == null || currSound == null || nextSound.filename != currSound.filename)) {
+    if (currSound != null) {
+      currSound.sound.stop();
+    }
+
+    if (nextSound != null) {
+      println("bodies: " + bodyCount + ". playing: " + nextSound.filename);
+      nextSound.sound.play();
+    }
+    else {
+      println("bodies: " + bodyCount + ". no sound to play");
+    }
+  }
+  currSound = nextSound;
+}
+
+BodyCountSound getBodyCountSoundByBodyCount(int bodyCount) {
+  for (int i = bodyCountSounds.size() - 1; i >= 0; i--) {
+    if (bodyCountSounds.get(i).bodyCount <= bodyCount) {
+      return bodyCountSounds.get(i);
+    }
+  }
+
+  return null;
+}
+
