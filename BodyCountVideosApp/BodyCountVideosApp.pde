@@ -1,11 +1,12 @@
-import java.util.*;
 import gab.opencv.*;
-import processing.video.*;
+import java.util.*;
 import org.openkinect.freenect.*;
 import org.openkinect.processing.*;
+import processing.sound.*;
+import processing.video.*;
 
 JSONObject configJSON;
-ArrayList<BodyCountFilename> audioFilenames;
+ArrayList<BodyCountSound> bodyCountSounds;
 
 Kinect kinect;
 OpenCV opencv;
@@ -16,7 +17,7 @@ void setup() {
 
   configJSON = loadJSONObject("config.json");
   String videoFilename = configJSON.getString("videoFilename");
-  audioFilenames = getBodyCountFilenames(configJSON.getJSONArray("audioFilenames"));
+  bodyCountSounds = getBodyCountSounds(configJSON.getJSONArray("audioFilenames"));
 
   kinect = new Kinect(this);
   kinect.initDepth();
@@ -54,24 +55,18 @@ void movieEvent(Movie m) {
   m.read();
 }
 
-ArrayList<BodyCountFilename> getBodyCountFilenames(JSONArray bodyCountFilenamesJSON) {
-  ArrayList<BodyCountFilename> result = new ArrayList<BodyCountFilename>();
-  for (int i = 0; i < bodyCountFilenamesJSON.size(); i++) {
-    JSONObject bodyCountFilenameJSON = bodyCountFilenamesJSON.getJSONObject(i);
-    result.add(new BodyCountFilename(bodyCountFilenameJSON));
+ArrayList<BodyCountSound> getBodyCountSounds(JSONArray audioFilenamesJSON) {
+  ArrayList<BodyCountSound> result = new ArrayList<BodyCountSound>();
+  for (int i = 0; i < audioFilenamesJSON.size(); i++) {
+    result.add(new BodyCountSound(this, audioFilenamesJSON.getJSONObject(i)));
   }
 
-  Comparator<BodyCountFilename> comparator = new Comparator<BodyCountFilename>() {
-    public int compare(BodyCountFilename a, BodyCountFilename b) {
+  Comparator<BodyCountSound> comparator = new Comparator<BodyCountSound>() {
+    public int compare(BodyCountSound a, BodyCountSound b) {
       return a.bodyCount - b.bodyCount;
     }
   };
   Collections.sort(result, comparator);
-
-  for (int i = 0; i < result.size(); i++) {
-    BodyCountFilename bodyCountFilename = result.get(i);
-    println(bodyCountFilename.bodyCount + " " + bodyCountFilename.filename);
-  }
 
   return result;
 }

@@ -1,10 +1,13 @@
+import processing.sound.*;
 
-class BodyCountFilename {
+class BodyCountSound {
   public int bodyCount;
   public String filename;
+  public SoundFile sound;
 
-  BodyCountFilename(JSONObject configBodyCountFilenameJSON) {
-    bodyCount = configBodyCountFilenameJSON.getInt("bodyCount");
-    filename = configBodyCountFilenameJSON.getString("filename");
+  BodyCountSound(BodyCountVideosApp sketch, JSONObject audioFilenameJSON) {
+    bodyCount = audioFilenameJSON.getInt("bodyCount");
+    filename = audioFilenameJSON.getString("filename");
+    sound = new SoundFile(sketch, filename);
   }
 }
