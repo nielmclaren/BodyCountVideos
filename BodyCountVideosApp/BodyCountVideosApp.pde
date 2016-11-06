@@ -21,8 +21,17 @@ PFont bodyCountFont;
 ArrayList<Integer> bodyCountHistory;
 int maxBodyCountHistorySize;
 
+boolean isPresentationMode;
+
 void setup() {
-  size(1920, 520);
+  // Toggle presentation mode here by switching the following line between `//*` and `/*`.
+  /*
+    isPresentationMode = true;
+    fullScreen();
+  /*/
+    isPresentationMode = false;
+    size(1920, 520);
+  //*/
 
   config = new Config();
   config.load();
@@ -48,16 +57,17 @@ void setup() {
 }
 
 void draw() {
-
   background(0);
-  image(kinect.getDepthImage(), 0, 0);
 
   updateThresholder(kinect.getDepthImage());
   opencv.loadImage(thresholder);
   opencv.blur(5);
   opencv.dilate();
 
-  image(opencv.getSnapshot(), 640, 0);
+  if (!isPresentationMode) {
+    image(kinect.getDepthImage(), 0, 0);
+    image(opencv.getSnapshot(), 640, 0);
+  }
 
   noFill();
   stroke(255, 0, 0);
@@ -67,23 +77,43 @@ void draw() {
   for (Contour contour : opencv.findContours()) {
     if (contour.area() >= config.minContourArea()
         && contour.area() <= config.maxContourArea()) {
-      contour.draw();
+      if (!isPresentationMode) {
+        contour.draw();
+      }
       bodyCount++;
     }
   }
 
-  image(movie, 1280, 0);
+  if (isPresentationMode) {
+    float screenAspect = (float)width / height;
+    float movieAspect = (float)movie.width / movie.height;
+    float w, h;
+
+    if (movieAspect > screenAspect) {
+      w = width;
+      h = w / movieAspect;
+      image(movie, 0, (height - h) / 2, w, h);
+    } else {
+      h = height;
+      w = h * movieAspect;
+      image(movie, (width - w) / 2, 0, w, h);
+    }
+  } else {
+    image(movie, 1280, 0);
+  }
 
   bodyCountHistory.add(bodyCount);
   if (bodyCountHistory.size() > maxBodyCountHistorySize) {
     bodyCountHistory.remove(0);
   }
 
-  noStroke();
-  fill(255);
-  for (int i = 0; i < bodyCountHistory.size(); i++) {
-    int h = bodyCountHistory.get(i) * 10;
-    rect(i * 8, height - h, 7, h);
+  if (!isPresentationMode) {
+    noStroke();
+    fill(255);
+    for (int i = 0; i < bodyCountHistory.size(); i++) {
+      int h = bodyCountHistory.get(i) * 10;
+      rect(i * 8, height - h, 7, h);
+    }
   }
 
   int averageBodyCount = 0;
@@ -102,9 +132,11 @@ void draw() {
     movie.pause();
   }
 
-  fill(255);
-  textFont(bodyCountFont);
-  text(averageBodyCount, 20, 120);
+  if (!isPresentationMode) {
+    fill(255);
+    textFont(bodyCountFont);
+    text(averageBodyCount, 20, 120);
+  }
 }
 
 void movieEvent(Movie m) {
