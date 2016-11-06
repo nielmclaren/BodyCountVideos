@@ -22,24 +22,40 @@ class Config {
     return configJSON.getString("videoFilename");
   }
 
-  public void depthThresholdMin(int v) {
-    JSONObject depthThresholdJSON = configJSON.getJSONObject("depthThreshold");
-    depthThresholdJSON.setInt("min", v);
-    configJSON.setJSONObject("depthThreshold", depthThresholdJSON);
+  public void minDepth(int v) {
+    configJSON.setInt("minDepth", v);
+    println("New min depth: " + v);
   }
 
-  public int depthThresholdMin() {
-    return configJSON.getJSONObject("depthThreshold").getInt("min");
+  public int minDepth() {
+    return configJSON.getInt("minDepth");
   }
 
-  public void depthThresholdMax(int v) {
-    JSONObject depthThresholdJSON = configJSON.getJSONObject("depthThreshold");
-    depthThresholdJSON.setInt("max", v);
-    configJSON.setJSONObject("depthThreshold", depthThresholdJSON);
+  public void maxDepth(int v) {
+    configJSON.setInt("maxDepth", v);
+    println("New max depth: " + v);
   }
 
-  public int depthThresholdMax() {
-    return configJSON.getJSONObject("depthThreshold").getInt("max");
+  public int maxDepth() {
+    return configJSON.getInt("maxDepth");
+  }
+
+  public void minContourArea(int v) {
+    configJSON.setInt("minContourArea", v);
+    println("New min contour area: " + v);
+  }
+
+  public int minContourArea() {
+    return configJSON.getInt("minContourArea");
+  }
+
+  public void maxContourArea(int v) {
+    configJSON.setInt("maxContourArea", v);
+    println("New max contour area: " + v);
+  }
+
+  public int maxContourArea() {
+    return configJSON.getInt("maxContourArea");
   }
 
   ArrayList<BodyCountSound> getBodyCountSounds(BodyCountVideosApp sketch) {

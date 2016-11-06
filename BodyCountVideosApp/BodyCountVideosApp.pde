@@ -15,6 +15,8 @@ Movie movie;
 
 PImage thresholder;
 
+PFont contourCountFont;
+
 void setup() {
   size(1920, 520);
 
@@ -34,6 +36,8 @@ void setup() {
   movie.loop();
 
   thresholder = createImage(kinect.width, kinect.height, ALPHA);
+
+  contourCountFont = createFont("data/roadgeek.ttf", 128);
 }
 
 void draw() {
@@ -45,19 +49,26 @@ void draw() {
 
   updateThresholder(kinect.getDepthImage());
   opencv.loadImage(thresholder);
-  opencv.blur(3);
-  opencv.dilate();
+  opencv.blur(5);
 
   image(opencv.getSnapshot(), 640, 0);
 
   noFill();
   stroke(255, 0, 0);
   strokeWeight(3);
+
+  int contourCount = 0;
   for (Contour contour : opencv.findContours()) {
-    if (contour.area() > 50) {
+    if (contour.area() >= config.minContourArea()
+        && contour.area() <= config.maxContourArea()) {
       contour.draw();
+      contourCount++;
     }
   }
+
+  fill(255);
+  textFont(contourCountFont);
+  text(contourCount, 20, 120);
 
   image(movie, 1280, 0);
 }
@@ -102,7 +113,7 @@ void updateThresholder(PImage source) {
   source.loadPixels();
   for (int i = 0; i < source.width * source.height; i++) {
     float b = brightness(source.pixels[i]);
-    thresholder.pixels[i] = b > config.depthThresholdMin() && b < config.depthThresholdMax() ? white : black;
+    thresholder.pixels[i] = b >= config.minDepth() && b <= config.maxDepth() ? white : black;
   }
   thresholder.updatePixels();
 }
@@ -110,23 +121,23 @@ void updateThresholder(PImage source) {
 void keyReleased() {
   switch(key) {
     case 'j':
-      config.depthThresholdMin(config.depthThresholdMin() - 1);
+      config.minDepth(config.minDepth() - 1);
       config.save();
       break;
     case 'k':
-      if (config.depthThresholdMin() < config.depthThresholdMax()) {
-        config.depthThresholdMin(config.depthThresholdMin() + 1);
+      if (config.minDepth() < config.maxDepth()) {
+        config.minDepth(config.minDepth() + 1);
         config.save();
       }
       break;
     case 'J':
-      if (config.depthThresholdMin() < config.depthThresholdMax()) {
-        config.depthThresholdMax(config.depthThresholdMax() - 1);
+      if (config.minDepth() < config.maxDepth()) {
+        config.maxDepth(config.maxDepth() - 1);
         config.save();
       }
       break;
     case 'K':
-      config.depthThresholdMax(config.depthThresholdMax() + 1);
+      config.maxDepth(config.maxDepth() + 1);
       config.save();
       break;
   }

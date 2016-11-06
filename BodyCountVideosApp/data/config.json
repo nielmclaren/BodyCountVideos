@@ -1,4 +1,7 @@
 {
+  "minDepth": 147,
+  "maxDepth": 154,
+  "minContourArea": 1000,
   "audioFilenames": [
     {
       "filename": "01 Deserted Skies.mp3",
@@ -38,8 +41,5 @@
     }
   ],
   "videoFilename": "moanmute.mp4",
-  "depthThreshold": {
-    "min": 147,
-    "max": 154
-  }
+  "maxContourArea": 100000
 }
