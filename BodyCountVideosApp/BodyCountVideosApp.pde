@@ -5,7 +5,7 @@ import org.openkinect.processing.*;
 import processing.sound.*;
 import processing.video.*;
 
-JSONObject configJSON;
+Config config;
 ArrayList<BodyCountSound> bodyCountSounds;
 BodyCountSound currSound;
 
@@ -13,16 +13,15 @@ Kinect kinect;
 OpenCV opencv;
 Movie movie;
 
-int lowerThreshold;
-int upperThreshold;
 PImage thresholder;
 
 void setup() {
   size(1920, 520);
 
-  configJSON = loadJSONObject("config.json");
-  String videoFilename = configJSON.getString("videoFilename");
-  bodyCountSounds = getBodyCountSounds(configJSON.getJSONArray("audioFilenames"));
+  config = new Config();
+  config.load();
+
+  bodyCountSounds = config.getBodyCountSounds(this);
   currSound = null;
 
   kinect = new Kinect(this);
@@ -31,11 +30,9 @@ void setup() {
 
   opencv = new OpenCV(this, 640, 480);
 
-  movie = new Movie(this, videoFilename);
+  movie = new Movie(this, config.videoFilename());
   movie.loop();
 
-  lowerThreshold = 145;
-  upperThreshold = 156;
   thresholder = createImage(kinect.width, kinect.height, ALPHA);
 }
 
@@ -67,22 +64,6 @@ void draw() {
 
 void movieEvent(Movie m) {
   m.read();
-}
-
-ArrayList<BodyCountSound> getBodyCountSounds(JSONArray audioFilenamesJSON) {
-  ArrayList<BodyCountSound> result = new ArrayList<BodyCountSound>();
-  for (int i = 0; i < audioFilenamesJSON.size(); i++) {
-    result.add(new BodyCountSound(this, audioFilenamesJSON.getJSONObject(i)));
-  }
-
-  Comparator<BodyCountSound> comparator = new Comparator<BodyCountSound>() {
-    public int compare(BodyCountSound a, BodyCountSound b) {
-      return a.bodyCount - b.bodyCount;
-    }
-  };
-  Collections.sort(result, comparator);
-
-  return result;
 }
 
 void updateSound(int bodyCount) {
@@ -121,7 +102,7 @@ void updateThresholder(PImage source) {
   source.loadPixels();
   for (int i = 0; i < source.width * source.height; i++) {
     float b = brightness(source.pixels[i]);
-    thresholder.pixels[i] = b > lowerThreshold && b < upperThreshold ? white : black;
+    thresholder.pixels[i] = b > config.depthThresholdMin() && b < config.depthThresholdMax() ? white : black;
   }
   thresholder.updatePixels();
 }
@@ -129,24 +110,24 @@ void updateThresholder(PImage source) {
 void keyReleased() {
   switch(key) {
     case 'j':
-      lowerThreshold--;
-      println("New lower threshold: " + lowerThreshold);
+      config.depthThresholdMin(config.depthThresholdMin() - 1);
+      config.save();
       break;
     case 'k':
-      if (lowerThreshold < upperThreshold) {
-        lowerThreshold++;
-        println("New lower threshold: " + lowerThreshold);
+      if (config.depthThresholdMin() < config.depthThresholdMax()) {
+        config.depthThresholdMin(config.depthThresholdMin() + 1);
+        config.save();
       }
       break;
     case 'J':
-      if (lowerThreshold < upperThreshold) {
-        upperThreshold--;
-        println("New upper threshold: " + upperThreshold);
+      if (config.depthThresholdMin() < config.depthThresholdMax()) {
+        config.depthThresholdMax(config.depthThresholdMax() - 1);
+        config.save();
       }
       break;
     case 'K':
-      upperThreshold++;
-      println("New upper threshold: " + upperThreshold);
+      config.depthThresholdMax(config.depthThresholdMax() + 1);
+      config.save();
       break;
   }
 }

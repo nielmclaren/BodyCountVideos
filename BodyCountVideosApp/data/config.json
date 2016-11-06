@@ -1,31 +1,45 @@
 {
+  "audioFilenames": [
+    {
+      "filename": "01 Deserted Skies.mp3",
+      "bodyCount": 0
+    },
+    {
+      "filename": "02 Floating Cube.mp3",
+      "bodyCount": 1
+    },
+    {
+      "filename": "03 To Light Alone I Bow.mp3",
+      "bodyCount": 2
+    },
+    {
+      "filename": "04 Hourglass.mp3",
+      "bodyCount": 3
+    },
+    {
+      "filename": "05 Omniverse.mp3",
+      "bodyCount": 4
+    },
+    {
+      "filename": "06 Black Mollies.mp3",
+      "bodyCount": 5
+    },
+    {
+      "filename": "07 Scalar Wave.mp3",
+      "bodyCount": 6
+    },
+    {
+      "filename": "08 Shunting Yard.mp3",
+      "bodyCount": 7
+    },
+    {
+      "filename": "09 Dirge.mp3",
+      "bodyCount": 8
+    }
+  ],
   "videoFilename": "moanmute.mp4",
-  "audioFilenames": [{
-    "bodyCount": 0,
-    "filename": "01 Deserted Skies.mp3"
-  }, {
-    "bodyCount": 1,
-    "filename": "02 Floating Cube.mp3"
-  }, {
-    "bodyCount": 2,
-    "filename": "03 To Light Alone I Bow.mp3"
-  }, {
-    "bodyCount": 3,
-    "filename": "04 Hourglass.mp3"
-  }, {
-    "bodyCount": 4,
-    "filename": "05 Omniverse.mp3"
-  }, {
-    "bodyCount": 5,
-    "filename": "06 Black Mollies.mp3"
-  }, {
-    "bodyCount": 6,
-    "filename": "07 Scalar Wave.mp3"
-  }, {
-    "bodyCount": 7,
-    "filename": "08 Shunting Yard.mp3"
-  }, {
-    "bodyCount": 8,
-    "filename": "09 Dirge.mp3"
-  }]
+  "depthThreshold": {
+    "min": 147,
+    "max": 154
+  }
 }
