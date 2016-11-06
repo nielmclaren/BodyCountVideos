@@ -74,5 +74,9 @@ class Config {
 
     return result;
   }
+
+  public int minSoundDuration() {
+    return configJSON.getInt("minSoundDuration");
+  }
 }
 

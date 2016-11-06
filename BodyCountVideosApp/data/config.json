@@ -41,5 +41,6 @@
     }
   ],
   "videoFilename": "moanmute.mp4",
-  "maxContourArea": 100000
+  "maxContourArea": 100000,
+  "minSoundDuration": 5000
 }
